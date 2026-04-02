@@ -11,6 +11,7 @@ import LoginPage from './LoginPage';
 import AdminDashboard from './AdminDashboard';
 import NewsEditor from './NewsEditor';
 import './App.css';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/admin/edit/:id" element={<NewsEditor />} />
             </Routes>
           </main>
+          <Toaster />
           <footer>
             <p>&copy; 2023 caniel.my.id. All rights reserved.</p>
           </footer>
