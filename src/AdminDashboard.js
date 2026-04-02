@@ -11,7 +11,7 @@ const AdminDashboard = () => {
     if (!isAuthenticated) navigate('/login');
     const savedBlogs = JSON.parse(localStorage.getItem('caniel_blogs')) || [];
     setBlogs(savedBlogs);
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, blogs]); // Added blogs to dependency array
 
   const deleteBlog = (id) => {
     if (window.confirm('Hapus berita ini?')) {
