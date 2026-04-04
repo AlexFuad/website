@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Clock, Newspaper, Loader2, ArrowRight } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
@@ -32,24 +33,31 @@ const NewsCard = ({ post, index }) => (
     whileHover={{ y: -8, scale: 1.02 }}
     className="group cursor-pointer overflow-hidden rounded-3xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-500"
   >
-    <div className="p-8">
-      <div className="flex items-center gap-3 mb-4">
-        <Clock className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          {new Date(post.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
-        </span>
+    <Link 
+      to={`/news/${post.id}`} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="block no-underline"
+    >
+      <div className="p-8">
+        <div className="flex items-center gap-3 mb-4">
+          <Clock className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            {new Date(post.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </span>
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 transition-colors line-clamp-2">
+          {post.title}
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3 mb-6">
+          {stripHtml(post.content).substring(0, 160)}...
+        </p>
+        <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-semibold group-hover:text-blue-700 dark:group-hover:text-blue-300">
+          Baca Selengkapnya
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+        </div>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 transition-colors line-clamp-2">
-        {post.title}
-      </h3>
-      <p className="text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3 mb-6">
-        {stripHtml(post.content).substring(0, 160)}...
-      </p>
-      <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-semibold group-hover:text-blue-700 dark:group-hover:text-blue-300">
-        Baca Selengkapnya
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-      </div>
-    </div>
+    </Link>
   </motion.div>
 );
 
