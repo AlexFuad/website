@@ -5,7 +5,11 @@
       "Bash(npm run *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Read(D:\\My Files\\Developer\\Project Caniel_Horizon AI/**)",
+      "Read(D:\\My Files\\Developer\\Project Caniel_Horizon AI\\src/**)",
+      "Read(D:\\My Files\\Developer\\Project Caniel_Horizon AI\\src\\pages\\admin/**)",
+      "Bash(npm install *)"
     ]
   },
   "$version": 3

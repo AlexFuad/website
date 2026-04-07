@@ -1,196 +1,180 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* Custom Tailwind compatible CSS vars for dark mode */
+/* Custom Tailwind compatible CSS vars - Dark Theme based on Horizon AI */
 :root {
-  --primary-color: #2563eb;
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 94.1%;
+  --radius: 0.75rem;
+  
+  /* Legacy vars for compatibility */
+  --primary-color: #3b82f6;
   --secondary-color: #1e293b;
   --accent-color: #3b82f6;
-  --text-main: #1f2937;
-  --text-muted: #6b7280;
-  --bg-body: #f9fafb;
-  --white: #ffffff;
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-[data-theme='dark'] {
-  --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
+  --text-main: hsl(210 40% 98%);
+  --text-muted: hsl(215 20.2% 65.1%);
   --bg-body: #0f172a;
-  --secondary-color: #f1f5f9;
   --white: #1e293b;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  border-color: hsl(var(--border));
 }
 
 body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-body);
-  color: var(--text-main);
+  color: hsl(var(--foreground));
+  min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-.App {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+/* Gradient Text Utility */
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.625rem 10%;
-  background-color: var(--white);
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+/* Glass Effect Utility */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  letter-spacing: -0.025em;
+/* Hero Gradient */
+.hero-gradient {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
 }
 
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 2rem;
+/* Service Card Styles */
+.service-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
 }
 
-.nav-links a {
-  color: var(--text-main);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: var(--transition);
+.service-card:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-5px);
 }
 
-.nav-links a:hover {
-  color: var(--primary-color);
+/* Blog Card Styles */
+.blog-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  transition: all 0.3s ease;
 }
 
-.page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 5%;
-  flex-grow: 1;
+.blog-card:hover {
+  background: rgba(30, 41, 59, 1);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-3px);
 }
 
-h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  color: var(--secondary-color);
-  letter-spacing: -0.025em;
+/* Portfolio Card Styles */
+.portfolio-card {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(51, 65, 85, 0.3);
+  transition: all 0.3s ease;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2.5rem;
+.portfolio-card:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  transform: scale(1.02);
 }
 
-.card {
-  background: var(--white);
-  padding: 2.5rem;
-  border-radius: 16px;
-  border: 1px solid #f1f5f9;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-}
-
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-  border-color: var(--primary-color);
-}
-
-footer {
-  text-align: center;
-  padding: 3rem;
-  background: var(--secondary-color);
-  color: #94a3b8;
-  margin-top: 60px;
-}
-
-footer p {
-  font-size: 0.9rem;
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: row;
-    gap: 1rem;
-    padding: 0.5rem 5%;
-  }
-  .nav-links {
-    gap: 1.25rem;
-  }
-  h1 {
-    font-size: 2rem;
-  }
-}
-
+/* Contact Form Styles */
 .contact-form {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 500px;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(71, 85, 105, 0.3);
 }
 
-.form-input, .form-textarea {
+/* Navigation Link Styles */
+.nav-link {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
   width: 100%;
-  padding: 0.8rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 1rem;
-  transition: var(--transition);
 }
 
-.form-input:focus, .form-textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+/* Animations */
+.floating-animation {
+  animation: float 6s ease-in-out infinite;
 }
 
-.form-button {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 1rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
 }
 
-/* Admin Form Specific Styles */
-.admin-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 2rem;
+.pulse-animation {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.admin-form label {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  display: block;
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
-/* Quill Editor specific styles */
-.ql-editor {
-  min-height: 200px; /* Ensure editor has a good default height */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
 }
