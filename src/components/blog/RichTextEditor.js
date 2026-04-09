@@ -1,128 +1,71 @@
-import React, { useRef, useState, useEffect } from 'react';
-import {
-  Bold, Italic, Underline, Link2, Code, List, ListOrdered, Quote, Image as ImageIcon, Video, Table
-} from 'lucide-react';
+import React, { useRef, useState, useCallback } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/Dialog';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import toast from 'react-hot-toast';
 
-const ToolbarButton = ({ onClick, children, isActive }) => (
-  <Button
-    type="button"
-    variant="ghost"
-    size="icon"
-    className={`h-8 w-8 ${isActive ? 'bg-slate-600 text-white' : 'text-gray-400'} hover:bg-slate-700 hover:text-white`}
-    onMouseDown={(e) => {
-      e.preventDefault();
-      onClick();
-    }}
-  >
-    {children}
-  </Button>
-);
-
 const RichTextEditor = ({ value, onChange }) => {
-  const editorRef = useRef(null);
-  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const quillRef = useRef(null);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
   const [isTableDialogOpen, setIsTableDialogOpen] = useState(false);
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
 
-  const [linkUrl, setLinkUrl] = useState('https://');
   const [imageUrl, setImageUrl] = useState('https://');
   const [videoUrl, setVideoUrl] = useState('');
   const [tableRows, setTableRows] = useState(3);
   const [tableCols, setTableCols] = useState(3);
+  const [linkUrl, setLinkUrl] = useState('https://');
 
-  const [savedSelection, setSavedSelection] = useState(null);
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (editor && value !== editor.innerHTML) {
-      editor.innerHTML = value;
+  const getQuillInstance = useCallback(() => {
+    if (quillRef.current) {
+      return quillRef.current.getEditor();
     }
-  }, [value]);
-
-  const saveSelection = () => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      setSavedSelection(selection.getRangeAt(0).cloneRange());
-    }
-  };
-
-  const restoreSelection = () => {
-    if (savedSelection) {
-      const selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(savedSelection);
-    }
-  };
-
-  const handleInput = () => {
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-
-  const execCmd = (command, value = null) => {
-    document.execCommand(command, false, value);
-    editorRef.current.focus();
-    handleInput();
-  };
-
-  const insertHtml = (html) => {
-    restoreSelection();
-    execCmd('insertHTML', html);
-  };
-
-  const openLinkDialog = () => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0 && !selection.getRangeAt(0).collapsed) {
-        saveSelection();
-        setIsLinkDialogOpen(true);
-    } else {
-        toast.error('Silakan pilih teks yang ingin Anda jadikan tautan.');
-    }
-  };
+    return null;
+  }, []);
 
   const handleAddLink = () => {
     setIsLinkDialogOpen(false);
-    restoreSelection();
     if (linkUrl && (linkUrl.startsWith('http://') || linkUrl.startsWith('https://'))) {
-        execCmd('createLink', linkUrl);
+      const quill = getQuillInstance();
+      if (quill) {
+        const range = quill.getSelection(true);
+        if (range) {
+          if (range.length > 0) {
+            quill.formatText(range.index, range.length, 'link', linkUrl);
+          } else {
+            quill.insertText(range.index, linkUrl, 'link', linkUrl);
+            quill.setSelection(range.index + linkUrl.length);
+          }
+          toast.success('Tautan berhasil ditambahkan!');
+        } else {
+          const length = quill.getLength();
+          quill.insertText(length, linkUrl, 'link', linkUrl);
+          toast.success('Tautan berhasil ditambahkan!');
+        }
+      }
     } else {
-        toast.error('Harap masukkan URL yang valid diawali dengan http:// atau https://.');
+      toast.error('Harap masukkan URL yang valid diawali dengan http:// atau https://.');
     }
     setLinkUrl('https://');
   };
 
-  const handleFormat = (format) => {
-    execCmd('formatBlock', `<${format}>`);
-  };
-
-  const handleBlockquote = () => {
-    execCmd('formatBlock', '<blockquote>');
-  };
-
-  const handleCodeSnippet = () => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const selectedText = range.toString();
-      const codeNode = document.createElement('code');
-      codeNode.textContent = selectedText;
-      range.deleteContents();
-      range.insertNode(codeNode);
-      selection.removeAllRanges();
-    }
-  }
-
   const handleAddImage = () => {
     setIsImageDialogOpen(false);
-    if(imageUrl) {
-        insertHtml(`<img src="${imageUrl}" alt="Image" style="max-width: 100%; height: auto;" />`);
+    if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://') || imageUrl.startsWith('data:') || imageUrl.startsWith('/'))) {
+      const quill = getQuillInstance();
+      if (quill) {
+        const range = quill.getSelection(true);
+        const index = range ? range.index : quill.getLength();
+        quill.insertEmbed(index, 'image', imageUrl);
+        quill.setSelection(index + 1);
+        toast.success('Gambar berhasil ditambahkan!');
+      }
+    } else {
+      toast.error('Harap masukkan URL gambar yang valid.');
     }
     setImageUrl('https://');
   };
@@ -135,101 +78,423 @@ const RichTextEditor = ({ value, onChange }) => {
         embedUrl = videoUrl.replace('watch?v=', 'embed/');
       } else if (videoUrl.includes('youtu.be/')) {
         embedUrl = videoUrl.replace('youtu.be/', 'www.youtube.com/embed/');
+      } else if (videoUrl.includes('vimeo.com/')) {
+        const videoId = videoUrl.split('vimeo.com/')[1]?.split('/')[0];
+        embedUrl = `https://player.vimeo.com/video/${videoId}`;
       }
-      insertHtml(`<iframe src="${embedUrl}" width="560" height="315" frameborder="0" allowfullscreen style="max-width: 100%;"></iframe>`);
+      
+      const quill = getQuillInstance();
+      if (quill) {
+        const range = quill.getSelection(true);
+        const index = range ? range.index : quill.getLength();
+        quill.insertEmbed(index, 'video', embedUrl);
+        quill.setSelection(index + 1);
+        toast.success('Video berhasil ditambahkan!');
+      }
+    } else {
+      toast.error('Harap masukkan URL video.');
     }
     setVideoUrl('');
   };
 
   const handleAddTable = () => {
     setIsTableDialogOpen(false);
-    let tableHtml = '<table style="width:100%; border-collapse: collapse; border: 1px solid #555;"><thead><tr>';
+    let tableHtml = '<table style="width:100%; border-collapse: collapse;">';
+    tableHtml += '<thead><tr>';
     for (let i = 0; i < tableCols; i++) {
-        tableHtml += `<th style="border: 1px solid #555; padding: 8px;">Header ${i + 1}</th>`;
+      tableHtml += `<th style="border: 1px solid #ccc; padding: 8px; background: #f5f5f5;">Header ${i + 1}</th>`;
     }
     tableHtml += '</tr></thead><tbody>';
     for (let i = 0; i < tableRows; i++) {
-        tableHtml += '<tr>';
-        for (let j = 0; j < tableCols; j++) {
-            tableHtml += `<td style="border: 1px solid #555; padding: 8px;">Cell ${i + 1}-${j + 1}</td>`;
-        }
-        tableHtml += '</tr>';
+      tableHtml += '<tr>';
+      for (let j = 0; j < tableCols; j++) {
+        tableHtml += `<td style="border: 1px solid #ccc; padding: 8px;">Cell ${i + 1},${j + 1}</td>`;
+      }
+      tableHtml += '</tr>';
     }
-    tableHtml += '</tbody></table><p></p>';
-    insertHtml(tableHtml);
+    tableHtml += '</tbody></table><p><br/></p>';
+    
+    const quill = getQuillInstance();
+    if (quill) {
+      const range = quill.getSelection(true);
+      const index = range ? range.index : quill.getLength();
+      quill.clipboard.dangerouslyPasteHTML(index, tableHtml);
+      toast.success('Tabel berhasil ditambahkan!');
+    }
   };
+
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+      ['blockquote', 'code-block'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'align': [] }],
+      ['link', 'image', 'video'],
+      ['clean']
+    ],
+    clipboard: {
+      matchVisual: true,
+    },
+  };
+
+  const formats = [
+    'header', 'size',
+    'bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block',
+    'list', 'bullet', 'indent',
+    'link', 'image', 'video', 'align',
+    'color', 'background', 'script',
+  ];
 
   return (
     <div className="rounded-lg border border-gray-700 bg-[#1A1A1A] focus-within:ring-2 focus-within:ring-blue-500">
-      <div className="flex flex-wrap items-center gap-1 border-b border-gray-700 p-2">
-        <select onChange={(e) => handleFormat(e.target.value)} className="bg-[#222] border border-gray-600 rounded-md p-1 text-sm h-8 mr-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="p">Paragraph</option>
-            <option value="h1">Heading 1</option>
-            <option value="h2">Heading 2</option>
-            <option value="h3">Heading 3</option>
-            <option value="h4">Heading 4</option>
-            <option value="h5">Heading 5</option>
-            <option value="h6">Heading 6</option>
-        </select>
-        <ToolbarButton onClick={openLinkDialog}><Link2 className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={() => execCmd('bold')}><Bold className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={() => execCmd('italic')}><Italic className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={() => execCmd('underline')}><Underline className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={handleBlockquote}><Quote className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={handleCodeSnippet}><Code className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={() => execCmd('insertUnorderedList')}><List className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={() => execCmd('insertOrderedList')}><ListOrdered className="h-4 w-4" /></ToolbarButton>
-        <div className="w-px h-5 bg-gray-700 mx-2"></div>
-        <ToolbarButton onClick={() => { saveSelection(); setIsImageDialogOpen(true); }}><ImageIcon className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={() => { saveSelection(); setIsVideoDialogOpen(true); }}><Video className="h-4 w-4" /></ToolbarButton>
-        <ToolbarButton onClick={() => { saveSelection(); setIsTableDialogOpen(true); }}><Table className="h-4 w-4" /></ToolbarButton>
+      {/* Additional Custom Toolbar Buttons */}
+      <div className="custom-toolbar-buttons">
+        <span className="ql-formats">
+          <button onClick={() => setIsLinkDialogOpen(true)} title="Insert Link" className="custom-btn">
+            <svg viewBox="0 0 18 18" style={{ width: '18px', height: '18px' }}>
+              <path className="ql-stroke" d="M5.76,12.24 L4.34,10.83 C3.56,10.05 3.56,8.79 4.34,8.01 L7.17,5.17 C7.95,4.39 9.21,4.39 9.99,5.17 L11.41,6.59" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <path className="ql-stroke" d="M12.24,5.76 L13.66,7.17 C14.44,7.95 14.44,9.21 13.66,9.99 L10.83,12.83 C10.05,13.61 8.79,13.61 8.01,12.83 L6.59,11.41" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </button>
+          <button onClick={() => setIsImageDialogOpen(true)} title="Insert Image" className="custom-btn">
+            <svg viewBox="0 0 18 18" style={{ width: '18px', height: '18px' }}>
+              <rect x="2" y="2" width="14" height="14" rx="2" className="ql-stroke" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <circle cx="6" cy="6" r="2" className="ql-stroke" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M2,14 L6,10 L9,13 L12,9 L16,13" className="ql-stroke" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </button>
+          <button onClick={() => setIsVideoDialogOpen(true)} title="Insert Video" className="custom-btn">
+            <svg viewBox="0 0 18 18" style={{ width: '18px', height: '18px' }}>
+              <rect x="2" y="3" width="14" height="12" rx="2" className="ql-stroke" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <polygon points="7,7 12,9 7,11" className="ql-fill" fill="currentColor"/>
+            </svg>
+          </button>
+          <button onClick={() => setIsTableDialogOpen(true)} title="Insert Table" className="custom-btn">
+            <svg viewBox="0 0 18 18" style={{ width: '18px', height: '18px' }}>
+              <rect className="ql-stroke" x="2" y="2" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <line className="ql-stroke" x1="2" y1="6" x2="16" y2="6" stroke="currentColor" strokeWidth="1.5"/>
+              <line className="ql-stroke" x1="2" y1="10" x2="16" y2="10" stroke="currentColor" strokeWidth="1.5"/>
+              <line className="ql-stroke" x1="6" y1="2" x2="6" y2="16" stroke="currentColor" strokeWidth="1.5"/>
+              <line className="ql-stroke" x1="10" y1="2" x2="10" y2="16" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </button>
+        </span>
       </div>
-      <div
-        ref={editorRef}
-        contentEditable
-        onInput={handleInput}
-        className="prose prose-invert max-w-none p-4 min-h-[300px] text-gray-300 focus:outline-none"
-        style={{ whiteSpace: 'pre-wrap' }}
+
+      {/* Quill Editor */}
+      <ReactQuill
+        ref={quillRef}
+        theme="snow"
+        value={value || ''}
+        onChange={onChange}
+        modules={modules}
+        formats={formats}
+        placeholder="Mulai tulis konten blog Anda di sini..."
+        className="quill-custom-editor"
       />
 
+      {/* Custom Styles */}
+      <style>{`
+        .custom-toolbar-buttons {
+          background: #1f2937;
+          border: 1px solid #374151;
+          border-bottom: none;
+          padding: 8px;
+          display: flex;
+          gap: 4px;
+        }
+
+        .custom-toolbar-buttons .ql-formats {
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+          margin-left: auto;
+        }
+
+        .custom-btn {
+          background: transparent;
+          border: none;
+          color: #9ca3af;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          transition: all 0.2s;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .custom-btn:hover {
+          background: #374151;
+          color: #fff;
+        }
+
+        .quill-custom-editor .ql-toolbar {
+          background: #1f2937;
+          border: 1px solid #374151;
+          border-bottom: none;
+          border-radius: 0.5rem 0.5rem 0 0;
+          padding: 8px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
+          align-items: center;
+        }
+
+        .quill-custom-editor .ql-toolbar .ql-formats {
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+        }
+
+        .quill-custom-editor .ql-toolbar button,
+        .quill-custom-editor .ql-toolbar select {
+          background: transparent;
+          border: none;
+          color: #9ca3af;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          transition: all 0.2s;
+        }
+
+        .quill-custom-editor .ql-toolbar button:hover,
+        .quill-custom-editor .ql-toolbar select:hover {
+          background: #374151;
+          color: #fff;
+        }
+
+        .quill-custom-editor .ql-toolbar button.ql-active {
+          background: #3b82f6;
+          color: #fff;
+        }
+
+        .quill-custom-editor .ql-toolbar select {
+          background: #111827;
+          border: 1px solid #374151;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 13px;
+          min-width: 60px;
+        }
+
+        .quill-custom-editor .ql-toolbar select:hover {
+          border-color: #4b5563;
+        }
+
+        .quill-custom-editor .ql-container {
+          border: 1px solid #374151;
+          border-radius: 0 0 0.5rem 0.5rem;
+          background: #1A1A1A;
+          font-size: 16px;
+        }
+
+        .quill-custom-editor .ql-editor {
+          min-height: 400px;
+          color: #d1d5db;
+          font-family: inherit;
+          line-height: 1.7;
+          cursor: text;
+        }
+
+        .quill-custom-editor .ql-editor:focus {
+          outline: none;
+        }
+
+        .quill-custom-editor .ql-container:focus {
+          outline: none;
+        }
+
+        .quill-custom-editor .ql-editor.ql-blank::before {
+          color: #6b7280;
+          font-style: normal;
+        }
+
+        .quill-custom-editor .ql-editor h1,
+        .quill-custom-editor .ql-editor h2,
+        .quill-custom-editor .ql-editor h3,
+        .quill-custom-editor .ql-editor h4,
+        .quill-custom-editor .ql-editor h5,
+        .quill-custom-editor .ql-editor h6 {
+          color: #fff;
+          margin: 1em 0 0.5em 0;
+        }
+
+        .quill-custom-editor .ql-editor h1 { font-size: 2em; font-weight: bold; }
+        .quill-custom-editor .ql-editor h2 { font-size: 1.5em; font-weight: bold; }
+        .quill-custom-editor .ql-editor h3 { font-size: 1.25em; font-weight: bold; }
+
+        .quill-custom-editor .ql-editor p {
+          margin-bottom: 1em;
+        }
+
+        .quill-custom-editor .ql-editor blockquote {
+          border-left: 4px solid #3b82f6;
+          padding-left: 16px;
+          margin-left: 0;
+          font-style: italic;
+          color: #9ca3af;
+        }
+
+        .quill-custom-editor .ql-editor pre.ql-syntax {
+          background-color: #111827;
+          border: 1px solid #374151;
+          border-radius: 6px;
+          padding: 16px;
+          overflow-x: auto;
+          font-family: 'Courier New', monospace;
+          color: #10b981;
+        }
+
+        .quill-custom-editor .ql-editor code {
+          background-color: #111827;
+          border-radius: 3px;
+          padding: 2px 6px;
+          font-family: 'Courier New', monospace;
+          color: #10b981;
+          font-size: 0.9em;
+        }
+
+        .quill-custom-editor .ql-editor img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 8px;
+          margin: 1em 0;
+        }
+
+        .quill-custom-editor .ql-editor table {
+          border-collapse: collapse;
+          width: 100%;
+          margin: 1em 0;
+        }
+
+        .quill-custom-editor .ql-editor table td,
+        .quill-custom-editor .ql-editor table th {
+          border: 1px solid #374151;
+          padding: 10px;
+          text-align: left;
+        }
+
+        .quill-custom-editor .ql-editor table th {
+          background-color: #374151;
+          font-weight: bold;
+          color: #fff;
+        }
+
+        .quill-custom-editor .ql-editor table tr:nth-child(even) {
+          background-color: #1f2937;
+        }
+
+        .quill-custom-editor .ql-editor ul,
+        .quill-custom-editor .ql-editor ol {
+          padding-left: 2em;
+          margin-bottom: 1em;
+        }
+
+        .quill-custom-editor .ql-editor li {
+          margin-bottom: 0.5em;
+        }
+      `}</style>
+
+      {/* Link Dialog */}
       <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700 text-white">
           <DialogHeader><DialogTitle>Masukkan URL Tautan</DialogTitle></DialogHeader>
-          <Input id="link-url" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} className="bg-slate-800 border-slate-600" />
-          <DialogFooter><Button onClick={handleAddLink}>Tambah Tautan</Button></DialogFooter>
+          <div className="py-4">
+            <Input 
+              id="link-url" 
+              value={linkUrl} 
+              onChange={(e) => setLinkUrl(e.target.value)} 
+              className="bg-slate-800 border-slate-600"
+              placeholder="https://example.com"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLinkDialogOpen(false)}>Batal</Button>
+            <Button onClick={handleAddLink}>Tambah Tautan</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* Image Dialog */}
       <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700 text-white">
           <DialogHeader><DialogTitle>Masukkan URL Gambar</DialogTitle></DialogHeader>
-          <Input id="image-url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="bg-slate-800 border-slate-600" />
-          <DialogFooter><Button onClick={handleAddImage}>Tambah Gambar</Button></DialogFooter>
+          <div className="py-4">
+            <Input 
+              id="image-url" 
+              value={imageUrl} 
+              onChange={(e) => setImageUrl(e.target.value)} 
+              className="bg-slate-800 border-slate-600"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsImageDialogOpen(false)}>Batal</Button>
+            <Button onClick={handleAddImage}>Tambah Gambar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* Video Dialog */}
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700 text-white">
-          <DialogHeader><DialogTitle>Masukkan URL Video (YouTube)</DialogTitle></DialogHeader>
-          <Input id="video-url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} className="bg-slate-800 border-slate-600" />
-          <DialogFooter><Button onClick={handleAddVideo}>Tambah Video</Button></DialogFooter>
+          <DialogHeader><DialogTitle>Masukkan URL Video (YouTube/Vimeo)</DialogTitle></DialogHeader>
+          <div className="py-4">
+            <Input 
+              id="video-url" 
+              value={videoUrl} 
+              onChange={(e) => setVideoUrl(e.target.value)} 
+              className="bg-slate-800 border-slate-600"
+              placeholder="https://youtube.com/watch?v=..."
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsVideoDialogOpen(false)}>Batal</Button>
+            <Button onClick={handleAddVideo}>Tambah Video</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* Table Dialog */}
       <Dialog open={isTableDialogOpen} onOpenChange={setIsTableDialogOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700 text-white">
           <DialogHeader><DialogTitle>Buat Tabel</DialogTitle></DialogHeader>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="py-4 grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="table-rows">Baris</Label>
-              <Input id="table-rows" type="number" value={tableRows} onChange={(e) => setTableRows(parseInt(e.target.value, 10))} className="bg-slate-800 border-slate-600" />
+              <Input 
+                id="table-rows" 
+                type="number" 
+                value={tableRows} 
+                onChange={(e) => setTableRows(parseInt(e.target.value, 10))} 
+                className="bg-slate-800 border-slate-600" 
+                min="1" 
+                max="20" 
+              />
             </div>
             <div>
               <Label htmlFor="table-cols">Kolom</Label>
-              <Input id="table-cols" type="number" value={tableCols} onChange={(e) => setTableCols(parseInt(e.target.value, 10))} className="bg-slate-800 border-slate-600" />
+              <Input 
+                id="table-cols" 
+                type="number" 
+                value={tableCols} 
+                onChange={(e) => setTableCols(parseInt(e.target.value, 10))} 
+                className="bg-slate-800 border-slate-600" 
+                min="1" 
+                max="10" 
+              />
             </div>
           </div>
-          <DialogFooter><Button onClick={handleAddTable}>Buat Tabel</Button></DialogFooter>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTableDialogOpen(false)}>Batal</Button>
+            <Button onClick={handleAddTable}>Buat Tabel</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
