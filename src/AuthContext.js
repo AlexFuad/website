@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (username, password) => {
     // Simulasi login sederhana
-    if (username === '4dM1n' && password === 'AdLia@23#02') {
+    if (username === '4dM1n' && password === '4dM1n@12&34') {
       const userData = { username: '4dM1n', role: 'admin' };
       localStorage.setItem('admin_user', JSON.stringify(userData));
       setUser(userData);
