@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { motion } from 'framer-motion';
 import { Lock, User, LogIn, Shield } from 'lucide-react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [captchaToken, setCaptchaToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const captchaRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Verify CAPTCHA
+    if (!captchaToken) {
+      toast.error('Silakan selesaikan verifikasi CAPTCHA');
+      return;
+    }
+
     setLoading(true);
 
     // Simulate a small delay for better UX
@@ -24,9 +34,16 @@ const LoginPage = () => {
       navigate('/admin');
     } else {
       toast.error('Username atau password salah');
+      // Reset CAPTCHA on failed login
+      captchaRef.current?.reset();
+      setCaptchaToken(null);
     }
-    
+
     setLoading(false);
+  };
+
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token);
   };
 
   return (
@@ -72,7 +89,7 @@ const LoginPage = () => {
                     className="w-full px-4 py-3 pl-12 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/50 transition-all duration-300 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="admin"
+                    placeholder="Masukkan username"
                     required
                     autoComplete="username"
                   />
@@ -100,10 +117,26 @@ const LoginPage = () => {
                 </div>
               </div>
 
+              {/* reCAPTCHA */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  <Shield className="w-4 h-4" />
+                  Verifikasi Keamanan
+                </label>
+                <div className="flex justify-center">
+                  <ReCAPTCHA
+                    ref={captchaRef}
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                    onChange={handleCaptchaChange}
+                    theme="light"
+                  />
+                </div>
+              </div>
+
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !captchaToken}
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {loading ? (
@@ -120,14 +153,12 @@ const LoginPage = () => {
               </button>
             </form>
 
-            {/* Info Box */}
+            {/* Security Info */}
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-              <p className="text-xs text-blue-800 dark:text-blue-300">
-                <strong className="font-semibold">Demo Credentials:</strong>
+              <p className="text-xs text-blue-800 dark:text-blue-300 text-center">
+                <strong className="font-semibold">🔒 Keamanan Terjaga</strong>
                 <br />
-                Username: <code className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded">4dM1n</code>
-                {' '}| Password:{' '}
-                <code className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded">AdLia@23#02</code>
+                Login dilindungi oleh Google reCAPTCHA
               </p>
             </div>
           </div>
