@@ -59,6 +59,196 @@ const NewsDetail = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      {/* Blog Content Styles */}
+      <style>{`
+        .blog-content {
+          font-size: 1.125rem;
+          line-height: 1.8;
+        }
+
+        .blog-content h1,
+        .blog-content h2,
+        .blog-content h3,
+        .blog-content h4,
+        .blog-content h5,
+        .blog-content h6 {
+          font-weight: 700;
+          margin-top: 2em;
+          margin-bottom: 0.5em;
+        }
+
+        .blog-content h1 { font-size: 2.5em; }
+        .blog-content h2 { font-size: 2em; }
+        .blog-content h3 { font-size: 1.5em; }
+        .blog-content h4 { font-size: 1.25em; }
+
+        .blog-content p {
+          margin-bottom: 1.5em;
+        }
+
+        .blog-content img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 12px;
+          margin: 2em 0;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          display: block;
+        }
+
+        .blog-content iframe {
+          max-width: 100%;
+          border-radius: 12px;
+          margin: 2em 0;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          display: block;
+        }
+
+        .blog-content table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 2em 0;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .blog-content table th {
+          font-weight: 700;
+          padding: 12px;
+          text-align: left;
+          border-bottom: 2px solid;
+        }
+
+        .blog-content table td {
+          padding: 12px;
+          border-bottom: 1px solid;
+        }
+
+        .blog-content table tr:nth-child(even) {
+        }
+
+        .blog-content blockquote {
+          border-left: 4px solid #3b82f6;
+          padding-left: 1.5em;
+          margin: 2em 0;
+          font-style: italic;
+          padding: 1em 1.5em;
+          border-radius: 0 8px 8px 0;
+        }
+
+        .blog-content pre,
+        .blog-content code {
+          border-radius: 6px;
+          padding: 1em;
+          font-family: 'Courier New', monospace;
+          color: #10b981;
+          overflow-x: auto;
+          margin: 1.5em 0;
+        }
+
+        .blog-content code {
+          padding: 0.2em 0.5em;
+          font-size: 0.9em;
+        }
+
+        .blog-content ul,
+        .blog-content ol {
+          padding-left: 2em;
+          margin: 1.5em 0;
+        }
+
+        .blog-content li {
+          margin-bottom: 0.5em;
+        }
+
+        .blog-content a {
+          color: #3b82f6;
+          text-decoration: underline;
+        }
+
+        .blog-content a:hover {
+          color: #2563eb;
+        }
+
+        /* Light mode */
+        :root:not(.dark) .blog-content h1,
+        :root:not(.dark) .blog-content h2,
+        :root:not(.dark) .blog-content h3,
+        :root:not(.dark) .blog-content h4,
+        :root:not(.dark) .blog-content h5,
+        :root:not(.dark) .blog-content h6 {
+          color: #111827;
+        }
+
+        :root:not(.dark) .blog-content p {
+          color: #374151;
+        }
+
+        :root:not(.dark) .blog-content table th {
+          background-color: #f3f4f6;
+          border-color: #e5e7eb;
+          color: #111827;
+        }
+
+        :root:not(.dark) .blog-content table td {
+          border-color: #e5e7eb;
+          color: #374151;
+        }
+
+        :root:not(.dark) .blog-content table tr:nth-child(even) {
+          background-color: #f9fafb;
+        }
+
+        :root:not(.dark) .blog-content blockquote {
+          color: #6b7280;
+          background-color: #f3f4f6;
+        }
+
+        :root:not(.dark) .blog-content pre,
+        :root:not(.dark) .blog-content code {
+          background-color: #1f2937;
+        }
+
+        /* Dark mode */
+        .dark .blog-content h1,
+        .dark .blog-content h2,
+        .dark .blog-content h3,
+        .dark .blog-content h4,
+        .dark .blog-content h5,
+        .dark .blog-content h6 {
+          color: #ffffff;
+        }
+
+        .dark .blog-content p {
+          color: #d1d5db;
+        }
+
+        .dark .blog-content table th {
+          background-color: #374151;
+          border-color: #4b5563;
+          color: #ffffff;
+        }
+
+        .dark .blog-content table td {
+          border-color: #374151;
+          color: #d1d5db;
+        }
+
+        .dark .blog-content table tr:nth-child(even) {
+          background-color: #1f2937;
+        }
+
+        .dark .blog-content blockquote {
+          color: #9ca3af;
+          background-color: #1f2937;
+        }
+
+        .dark .blog-content pre,
+        .dark .blog-content code {
+          background-color: #111827;
+        }
+      `}</style>
+
       {/* Hero Header */}
       <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
         <div className="absolute inset-0 bg-black/10" />
@@ -108,11 +298,11 @@ const NewsDetail = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="prose prose-lg dark:prose-invert max-w-none"
+            className="max-w-none"
           >
             {/* Blog Content */}
             <div
-              className="text-gray-700 dark:text-gray-300 leading-relaxed"
+              className="blog-content text-gray-700 dark:text-gray-300 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
           </motion.article>

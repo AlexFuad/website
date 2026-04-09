@@ -15,7 +15,9 @@ const RichTextEditor = ({ value, onChange }) => {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
 
   const [imageUrl, setImageUrl] = useState('https://');
+  const [imageSize, setImageSize] = useState('medium');
   const [videoUrl, setVideoUrl] = useState('');
+  const [videoSize, setVideoSize] = useState('large');
   const [tableRows, setTableRows] = useState(3);
   const [tableCols, setTableCols] = useState(3);
   const [linkUrl, setLinkUrl] = useState('https://');
@@ -60,7 +62,21 @@ const RichTextEditor = ({ value, onChange }) => {
       if (quill) {
         const range = quill.getSelection(true);
         const index = range ? range.index : quill.getLength();
-        quill.insertEmbed(index, 'image', imageUrl);
+        
+        // Determine image dimensions based on selected size
+        const sizeConfig = {
+          small: { width: '300', height: 'auto' },
+          medium: { width: '600', height: 'auto' },
+          large: { width: '900', height: 'auto' },
+          full: { width: '100%', height: 'auto' },
+          custom: { width: 'auto', height: 'auto' }
+        };
+        
+        const dimensions = sizeConfig[imageSize] || sizeConfig.medium;
+        const styleAttr = `max-width: ${dimensions.width}; width: ${dimensions.width}; height: ${dimensions.height};`;
+        const imageHtml = `<img src="${imageUrl}" alt="Image" style="${styleAttr}" />`;
+        
+        quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
         quill.setSelection(index + 1);
         toast.success('Gambar berhasil ditambahkan!');
       }
@@ -68,6 +84,7 @@ const RichTextEditor = ({ value, onChange }) => {
       toast.error('Harap masukkan URL gambar yang valid.');
     }
     setImageUrl('https://');
+    setImageSize('medium');
   };
 
   const handleAddVideo = () => {
@@ -82,12 +99,34 @@ const RichTextEditor = ({ value, onChange }) => {
         const videoId = videoUrl.split('vimeo.com/')[1]?.split('/')[0];
         embedUrl = `https://player.vimeo.com/video/${videoId}`;
       }
-      
+
       const quill = getQuillInstance();
       if (quill) {
         const range = quill.getSelection(true);
         const index = range ? range.index : quill.getLength();
+        
+        // Determine video dimensions based on selected size
+        const sizeConfig = {
+          small: { width: '480', height: '270' },
+          medium: { width: '640', height: '360' },
+          large: { width: '854', height: '480' },
+          full: { width: '100%', height: 'auto' }
+        };
+        
+        const dimensions = sizeConfig[videoSize] || sizeConfig.large;
+        const styleAttr = `width: ${dimensions.width}; height: ${dimensions.height}; max-width: 100%;`;
+        
         quill.insertEmbed(index, 'video', embedUrl);
+        
+        // Apply size to the video iframe
+        setTimeout(() => {
+          const editor = quill.root;
+          const iframes = editor.querySelectorAll('iframe[src*="youtube"], iframe[src*="vimeo"]');
+          iframes.forEach(iframe => {
+            iframe.style.cssText = styleAttr;
+          });
+        }, 100);
+        
         quill.setSelection(index + 1);
         toast.success('Video berhasil ditambahkan!');
       }
@@ -95,6 +134,7 @@ const RichTextEditor = ({ value, onChange }) => {
       toast.error('Harap masukkan URL video.');
     }
     setVideoUrl('');
+    setVideoSize('large');
   };
 
   const handleAddTable = () => {
@@ -365,6 +405,15 @@ const RichTextEditor = ({ value, onChange }) => {
           height: auto;
           border-radius: 8px;
           margin: 1em 0;
+          display: block;
+        }
+
+        .quill-custom-editor .ql-editor iframe,
+        .quill-custom-editor .ql-editor video {
+          max-width: 100%;
+          border-radius: 8px;
+          margin: 1em 0;
+          display: block;
         }
 
         .quill-custom-editor .ql-editor table {
@@ -425,17 +474,47 @@ const RichTextEditor = ({ value, onChange }) => {
       <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700 text-white">
           <DialogHeader><DialogTitle>Masukkan URL Gambar</DialogTitle></DialogHeader>
-          <div className="py-4">
-            <Input 
-              id="image-url" 
-              value={imageUrl} 
-              onChange={(e) => setImageUrl(e.target.value)} 
-              className="bg-slate-800 border-slate-600"
-              placeholder="https://example.com/image.jpg"
-            />
+          <div className="py-4 space-y-4">
+            <div>
+              <Label htmlFor="image-url">URL Gambar</Label>
+              <Input
+                id="image-url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="bg-slate-800 border-slate-600 mt-2"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            <div>
+              <Label htmlFor="image-size">Ukuran Gambar</Label>
+              <select
+                id="image-size"
+                value={imageSize}
+                onChange={(e) => setImageSize(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-sm text-white mt-2 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="small">Kecil (300px)</option>
+                <option value="medium">Sedang (600px)</option>
+                <option value="large">Besar (900px)</option>
+                <option value="full">Penuh (100%)</option>
+              </select>
+            </div>
+            {imageUrl && (
+              <div className="mt-3">
+                <Label>Preview</Label>
+                <div className="mt-2 rounded-lg overflow-hidden border border-slate-600 bg-slate-800 flex items-center justify-center">
+                  <img 
+                    src={imageUrl} 
+                    alt="Preview" 
+                    className="max-w-full max-h-40 object-contain"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsImageDialogOpen(false)}>Batal</Button>
+            <Button variant="outline" onClick={() => { setIsImageDialogOpen(false); setImageUrl('https://'); setImageSize('medium'); }}>Batal</Button>
             <Button onClick={handleAddImage}>Tambah Gambar</Button>
           </DialogFooter>
         </DialogContent>
@@ -445,17 +524,38 @@ const RichTextEditor = ({ value, onChange }) => {
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
         <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-700 text-white">
           <DialogHeader><DialogTitle>Masukkan URL Video (YouTube/Vimeo)</DialogTitle></DialogHeader>
-          <div className="py-4">
-            <Input 
-              id="video-url" 
-              value={videoUrl} 
-              onChange={(e) => setVideoUrl(e.target.value)} 
-              className="bg-slate-800 border-slate-600"
-              placeholder="https://youtube.com/watch?v=..."
-            />
+          <div className="py-4 space-y-4">
+            <div>
+              <Label htmlFor="video-url">URL Video</Label>
+              <Input
+                id="video-url"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                className="bg-slate-800 border-slate-600 mt-2"
+                placeholder="https://youtube.com/watch?v=..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="video-size">Ukuran Video</Label>
+              <select
+                id="video-size"
+                value={videoSize}
+                onChange={(e) => setVideoSize(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-sm text-white mt-2 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="small">Kecil (480x270)</option>
+                <option value="medium">Sedang (640x360)</option>
+                <option value="large">Besar (854x480)</option>
+                <option value="full">Penuh (100%)</option>
+              </select>
+            </div>
+            <div className="text-xs text-slate-400">
+              <p>💡 Tip: Gunakan URL embed YouTube atau Vimeo</p>
+              <p>Contoh: https://youtube.com/embed/VIDEO_ID</p>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsVideoDialogOpen(false)}>Batal</Button>
+            <Button variant="outline" onClick={() => { setIsVideoDialogOpen(false); setVideoUrl(''); setVideoSize('large'); }}>Batal</Button>
             <Button onClick={handleAddVideo}>Tambah Video</Button>
           </DialogFooter>
         </DialogContent>
