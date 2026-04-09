@@ -126,7 +126,7 @@ const LoginPage = () => {
                 <div className="flex justify-center">
                   <ReCAPTCHA
                     ref={captchaRef}
-                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'}
                     onChange={handleCaptchaChange}
                     theme="light"
                   />
