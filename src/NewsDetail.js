@@ -9,13 +9,13 @@ const NewsDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedBlogs = JSON.parse(localStorage.getItem('caniel_blogs')) || [];
+    const savedBlogs = JSON.parse(localStorage.getItem('digitalita_blogs')) || [];
     const foundBlog = savedBlogs.find(b => b.id === parseInt(id));
-    
+
     if (foundBlog) {
       // Increment views
       foundBlog.views = (foundBlog.views || 0) + 1;
-      localStorage.setItem('caniel_blogs', JSON.stringify(savedBlogs));
+      localStorage.setItem('digitalita_blogs', JSON.stringify(savedBlogs));
       setBlog(foundBlog);
     }
     

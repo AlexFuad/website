@@ -68,7 +68,7 @@ const News = () => {
   const [filter, setFilter] = useState('all'); // 'all', 'recent', 'popular'
 
   useEffect(() => {
-    const savedBlogs = JSON.parse(localStorage.getItem('caniel_blogs')) || [];
+    const savedBlogs = JSON.parse(localStorage.getItem('digitalita_blogs')) || [];
     setBlogs(savedBlogs.sort((a, b) => new Date(b.date) - new Date(a.date)));
     setLoading(false);
   }, []);
@@ -94,7 +94,7 @@ const News = () => {
           Latest News & Blogs
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          Ikuti perkembangan terbaru dari Caniel, dapatkan insight industri, dan temukan tips bermanfaat seputar dunia digital.
+          Ikuti perkembangan terbaru dari Digitalita, dapatkan insight industri, dan temukan tips bermanfaat seputar dunia digital.
         </p>
       </motion.div>
 

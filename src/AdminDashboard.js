@@ -35,7 +35,7 @@ const AdminDashboard = () => {
 
   const loadBlogs = () => {
     setLoading(true);
-    const savedBlogs = JSON.parse(localStorage.getItem('caniel_blogs')) || [];
+    const savedBlogs = JSON.parse(localStorage.getItem('digitalita_blogs')) || [];
     setBlogs(savedBlogs);
     setLoading(false);
   };
@@ -73,7 +73,7 @@ const AdminDashboard = () => {
       toast.success('Artikel berhasil dibuat!');
     }
 
-    localStorage.setItem('caniel_blogs', JSON.stringify(updatedBlogs));
+    localStorage.setItem('digitalita_blogs', JSON.stringify(updatedBlogs));
     setBlogs(updatedBlogs);
     setIsEditing(false);
     setCurrentArticle(null);
@@ -81,7 +81,7 @@ const AdminDashboard = () => {
 
   const handleDeleteArticle = () => {
     const updatedBlogs = blogs.filter(b => b.id !== articleToDelete.id);
-    localStorage.setItem('caniel_blogs', JSON.stringify(updatedBlogs));
+    localStorage.setItem('digitalita_blogs', JSON.stringify(updatedBlogs));
     setBlogs(updatedBlogs);
     setIsDeleteConfirmOpen(false);
     setArticleToDelete(null);

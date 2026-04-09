@@ -28,7 +28,7 @@ const Contact = () => {
     {
       icon: Mail,
       title: 'Email',
-      value: 'info@caniel.my.id',
+      value: 'info@digitalita.my.id',
       description: 'Send us an email anytime',
       color: 'from-blue-500 to-indigo-600'
     },

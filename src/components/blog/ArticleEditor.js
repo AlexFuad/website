@@ -17,7 +17,7 @@ const ArticleEditor = ({ isOpen, setIsOpen, article, onSave, onBack }) => {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('web-development');
   const [tags, setTags] = useState('');
-  const [author, setAuthor] = useState('Caniel Agency');
+  const [author, setAuthor] = useState('Digitalita Agency');
   const [featured, setFeatured] = useState(false);
   const [activeField, setActiveField] = useState('title');
 
@@ -38,7 +38,7 @@ const ArticleEditor = ({ isOpen, setIsOpen, article, onSave, onBack }) => {
       setContent(article.content || '');
       setCategory(article.category || 'web-development');
       setTags(article.tags?.join(', ') || '');
-      setAuthor(article.author || 'Caniel Agency');
+      setAuthor(article.author || 'Digitalita Agency');
       setFeatured(article.featured || false);
     } else {
       const today = new Date().toISOString().split('T')[0];
@@ -49,7 +49,7 @@ const ArticleEditor = ({ isOpen, setIsOpen, article, onSave, onBack }) => {
       setContent('<p>Tulis konten luar biasa Anda di sini...</p>');
       setCategory('web-development');
       setTags('');
-      setAuthor('Caniel Agency');
+      setAuthor('Digitalita Agency');
       setFeatured(false);
     }
   }, [article]);

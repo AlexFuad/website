@@ -31,7 +31,7 @@ const About = () => {
   ];
 
   const milestones = [
-    { year: '2018', title: 'Company Founded', description: 'Caniel was established with a vision to transform digital experiences' },
+    { year: '2018', title: 'Company Founded', description: 'Digitalita was established with a vision to transform digital experiences' },
     { year: '2019', title: 'First Major Client', description: 'Successfully delivered enterprise-level web application' },
     { year: '2020', title: 'Team Expansion', description: 'Grew our team of experts to serve more clients globally' },
     { year: '2021', title: '100+ Projects', description: 'Reached milestone of 100+ successful project deliveries' },
@@ -57,7 +57,7 @@ const About = () => {
               animate={{ scale: 1 }}
               transition={{ duration: 0.5 }}
             >
-              About Caniel
+              About Digitalita
             </motion.h1>
             <motion.p
               className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90 leading-relaxed"

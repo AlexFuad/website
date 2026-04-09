@@ -53,7 +53,7 @@ const LoginPage = () => {
               Admin Login
             </h1>
             <p className="text-blue-100 text-sm">
-              Akses dashboard admin Caniel
+              Akses dashboard admin Digitalita
             </p>
           </div>
 
@@ -125,9 +125,9 @@ const LoginPage = () => {
               <p className="text-xs text-blue-800 dark:text-blue-300">
                 <strong className="font-semibold">Demo Credentials:</strong>
                 <br />
-                Username: <code className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded">admin</code>
+                Username: <code className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded">4dM1n</code>
                 {' '}| Password:{' '}
-                <code className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded">admin123</code>
+                <code className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded">AdLia@23#02</code>
               </p>
             </div>
           </div>

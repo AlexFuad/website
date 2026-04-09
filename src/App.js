@@ -39,7 +39,7 @@ function App() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <div className="mb-4">
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                  CANIEL
+                  DIGITALITA
                 </h3>
                 <p className="text-gray-400">
                   Transforming visions into digital reality
@@ -47,7 +47,7 @@ function App() {
               </div>
               <div className="border-t border-gray-700 pt-6">
                 <p className="text-gray-500 text-sm">
-                  &copy; {new Date().getFullYear()} caniel.my.id. All rights reserved.
+                  &copy; {new Date().getFullYear()} digitalita.my.id. All rights reserved.
                 </p>
               </div>
             </div>

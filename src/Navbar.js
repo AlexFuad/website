@@ -41,7 +41,7 @@ const Navbar = () => {
                 <span className="text-white font-black text-sm sm:text-base md:text-lg">C</span>
               </div>
               <span className="text-xl sm:text-2xl md:text-2xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
-                CANIEL
+                DIGITALITA
               </span>
             </Link>
           </div>

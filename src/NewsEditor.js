@@ -24,7 +24,7 @@ const NewsEditor = () => {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      const blogs = JSON.parse(localStorage.getItem('caniel_blogs')) || [];
+      const blogs = JSON.parse(localStorage.getItem('digitalita_blogs')) || [];
       const blog = blogs.find(b => b.id === parseInt(id));
       if (blog) {
         setArticle({
@@ -32,7 +32,7 @@ const NewsEditor = () => {
           slug: blog.slug || blog.title?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
           category: blog.category || 'web-development',
           tags: blog.tags || [],
-          author: blog.author || 'Caniel Agency',
+          author: blog.author || 'Digitalita Agency',
           featured: blog.featured || false,
         });
       }
@@ -43,7 +43,7 @@ const NewsEditor = () => {
   }, [id]);
 
   const handleSave = (savedArticle) => {
-    let blogs = JSON.parse(localStorage.getItem('caniel_blogs')) || [];
+    let blogs = JSON.parse(localStorage.getItem('digitalita_blogs')) || [];
 
     if (id) {
       blogs = blogs.map(b => b.id === parseInt(id) ? savedArticle : b);
@@ -53,7 +53,7 @@ const NewsEditor = () => {
       toast.success('Berita berhasil dibuat');
     }
 
-    localStorage.setItem('caniel_blogs', JSON.stringify(blogs));
+    localStorage.setItem('digitalita_blogs', JSON.stringify(blogs));
 
     setTimeout(() => {
       navigate('/admin');

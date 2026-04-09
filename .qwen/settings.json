@@ -9,7 +9,14 @@
       "Read(D:\\My Files\\Developer\\Project Caniel_Horizon AI/**)",
       "Read(D:\\My Files\\Developer\\Project Caniel_Horizon AI\\src/**)",
       "Read(D:\\My Files\\Developer\\Project Caniel_Horizon AI\\src\\pages\\admin/**)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(netstat *)",
+      "Bash(findstr *)",
+      "Bash(taskkill *)",
+      "Bash(timeout *)",
+      "Bash(npx *)",
+      "Bash(set *)",
+      "Bash(rmdir *)"
     ]
   },
   "$version": 3
