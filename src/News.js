@@ -83,98 +83,110 @@ const News = () => {
   });
 
   return (
-    <div className="page-container py-20">
+    <div className="min-h-screen">
       <Toaster />
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-20"
-      >
-        <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
-          Latest News & Blogs
-        </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          Ikuti perkembangan terbaru dari Digitalita, dapatkan insight industri, dan temukan tips bermanfaat seputar dunia digital.
-        </p>
-      </motion.div>
-
-      {/* Search & Filter */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="flex flex-col lg:flex-row gap-4 mb-16 max-w-2xl mx-auto"
-      >
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Cari artikel..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/50 transition-all duration-300 text-lg placeholder-gray-500"
-          />
-        </div>
-        <div className="flex gap-2">
-          {['all', 'recent', 'popular'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-6 py-4 rounded-2xl font-semibold transition-all duration-300 ${
-                filter === f
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/50'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-              }`}
-            >
-              {f === 'all' ? 'Semua' : f === 'recent' ? 'Terbaru' : 'Populer'}
-            </button>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* News Grid */}
-      <AnimatePresence>
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
-              <NewsSkeleton key={i} />
-            ))}
-          </div>
-        ) : filteredBlogs.length === 0 ? (
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden pt-24">
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-32"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center text-white"
           >
-            <Newspaper className="w-24 h-24 text-gray-400 mx-auto mb-8 opacity-50" />
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Tidak ada artikel ditemukan</h3>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-              Coba ubah kata kunci pencarian atau filter
+            <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-6">
+              Latest News & Blogs
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90 leading-relaxed">
+              Ikuti perkembangan terbaru dari Digitalita, dapatkan insight industri, dan temukan tips bermanfaat seputar dunia digital.
             </p>
+            <div className="w-24 h-1 bg-white/50 rounded-full mx-auto" />
           </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredBlogs.map((post, index) => (
-              <NewsCard key={post.id} post={post} index={index} />
-            ))}
-          </div>
-        )}
-      </AnimatePresence>
+        </div>
+      </section>
 
-      {/* Load More Button (for future infinite scroll) */}
-      {!loading && filteredBlogs.length > 0 && (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mt-20"
-        >
-          <button className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-6 rounded-3xl font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-500 flex items-center gap-3 mx-auto">
-            <Loader2 className="w-5 h-5 animate-spin group-hover:animate-none" />
-            Load More Articles
-          </button>
-        </motion.div>
-      )}
+      {/* Content Section */}
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Search & Filter */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-col lg:flex-row gap-4 mb-16 max-w-2xl mx-auto"
+          >
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari artikel..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/50 transition-all duration-300 text-lg placeholder-gray-500"
+              />
+            </div>
+            <div className="flex gap-2">
+              {['all', 'recent', 'popular'].map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-6 py-4 rounded-2xl font-semibold transition-all duration-300 ${
+                    filter === f
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/50'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {f === 'all' ? 'Semua' : f === 'recent' ? 'Terbaru' : 'Populer'}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* News Grid */}
+          <AnimatePresence>
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(6)].map((_, i) => (
+                  <NewsSkeleton key={i} />
+                ))}
+              </div>
+            ) : filteredBlogs.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-32"
+              >
+                <Newspaper className="w-24 h-24 text-gray-400 mx-auto mb-8 opacity-50" />
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Tidak ada artikel ditemukan</h3>
+                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                  Coba ubah kata kunci pencarian atau filter
+                </p>
+              </motion.div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredBlogs.map((post, index) => (
+                  <NewsCard key={post.id} post={post} index={index} />
+                ))}
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* Load More Button (for future infinite scroll) */}
+          {!loading && filteredBlogs.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mt-20"
+            >
+              <button className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-6 rounded-3xl font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-500 flex items-center gap-3 mx-auto">
+                <Loader2 className="w-5 h-5 animate-spin group-hover:animate-none" />
+                Load More Articles
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

@@ -58,7 +58,7 @@ const NewsDetail = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen">
       {/* Blog Content Styles */}
       <style>{`
         .blog-content {
@@ -116,15 +116,16 @@ const NewsDetail = () => {
           font-weight: 700;
           padding: 12px;
           text-align: left;
-          border-bottom: 2px solid;
+          border-bottom: 2px solid currentColor;
         }
 
         .blog-content table td {
           padding: 12px;
-          border-bottom: 1px solid;
+          border-bottom: 1px solid currentColor;
         }
 
         .blog-content table tr:nth-child(even) {
+          background-color: transparent;
         }
 
         .blog-content blockquote {
@@ -250,7 +251,7 @@ const NewsDetail = () => {
       `}</style>
 
       {/* Hero Header */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden pt-24">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <motion.div

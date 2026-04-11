@@ -16,7 +16,11 @@
       "Bash(timeout *)",
       "Bash(npx *)",
       "Bash(set *)",
-      "Bash(rmdir *)"
+      "Bash(rmdir *)",
+      "Bash(npm *)",
+      "Bash(tasklist *)",
+      "Bash(node *)",
+      "Bash(git reset)"
     ]
   },
   "$version": 3

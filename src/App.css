@@ -178,3 +178,25 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #2563eb, #7c3aed);
 }
+
+/* Nav Link Underline Effect */
+.nav-link {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}

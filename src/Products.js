@@ -55,9 +55,9 @@ const Products = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-green-600 via-blue-600 to-indigo-700 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-green-600 via-blue-600 to-indigo-700 overflow-hidden pt-24">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <motion.div

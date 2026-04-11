@@ -2,18 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { motion } from 'framer-motion';
-import { 
-  Plus, Edit2, Trash2, LogOut, FileText, Calendar, Eye, 
+import {
+  Plus, Edit2, Trash2, LogOut, FileText, Calendar, Eye,
   TrendingUp, BarChart, Database, Settings, Share2, Clock,
-  ChevronLeft, Search, MoreHorizontal, Trello, HardDrive, FilePlus, Check
+  ChevronLeft, Search, MoreHorizontal, Trello, HardDrive, FilePlus, Check,
+  Package, Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import ArticleEditor from './components/blog/ArticleEditor';
 import DeleteConfirmation from './components/blog/DeleteConfirmation';
+import ProductEditor from './components/products/ProductEditor';
+import UserManagement from './components/admin/UserManagement';
 
 const AdminDashboard = () => {
   const [blogs, setBlogs] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [currentArticle, setCurrentArticle] = useState(null);
@@ -22,7 +26,10 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showDashboard, setShowDashboard] = useState(true);
   const [selectedCollection, setSelectedCollection] = useState('blog');
-  const { isAuthenticated, logout } = useAuth();
+  const [isProductEditorOpen, setIsProductEditorOpen] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
+  const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+  const { isAuthenticated, user, logout, users, addUser, updateUser, deleteUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +38,7 @@ const AdminDashboard = () => {
       return;
     }
     loadBlogs();
+    loadProducts();
   }, [isAuthenticated, navigate]);
 
   const loadBlogs = () => {
@@ -38,6 +46,11 @@ const AdminDashboard = () => {
     const savedBlogs = JSON.parse(localStorage.getItem('digitalita_blogs')) || [];
     setBlogs(savedBlogs);
     setLoading(false);
+  };
+
+  const loadProducts = () => {
+    const savedProducts = JSON.parse(localStorage.getItem('digitalita_products')) || [];
+    setProducts(savedProducts);
   };
 
   // Calculate dashboard statistics
@@ -79,6 +92,34 @@ const AdminDashboard = () => {
     setCurrentArticle(null);
   };
 
+  const handleSaveProduct = (product) => {
+    let updatedProducts;
+    const existingProduct = products.find(p => p.id === product.id);
+
+    if (existingProduct) {
+      updatedProducts = products.map(p => p.id === product.id ? { ...product, updatedAt: new Date().toISOString() } : p);
+      toast.success('Produk berhasil diupdate!');
+    } else {
+      const newProduct = { ...product, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      updatedProducts = [newProduct, ...products];
+      toast.success('Produk berhasil dibuat!');
+    }
+
+    localStorage.setItem('digitalita_products', JSON.stringify(updatedProducts));
+    setProducts(updatedProducts);
+    setIsProductEditorOpen(false);
+    setCurrentProduct(null);
+  };
+
+  const handleDeleteProduct = (productId) => {
+    if (window.confirm('Yakin ingin menghapus produk ini?')) {
+      const updatedProducts = products.filter(p => p.id !== productId);
+      localStorage.setItem('digitalita_products', JSON.stringify(updatedProducts));
+      setProducts(updatedProducts);
+      toast.success('Produk berhasil dihapus.');
+    }
+  };
+
   const handleDeleteArticle = () => {
     const updatedBlogs = blogs.filter(b => b.id !== articleToDelete.id);
     localStorage.setItem('digitalita_blogs', JSON.stringify(updatedBlogs));
@@ -92,6 +133,11 @@ const AdminDashboard = () => {
     setCurrentArticle(article);
     setIsEditing(true);
     setShowDashboard(false);
+  };
+
+  const openProductEditor = (product = null) => {
+    setCurrentProduct(product);
+    setIsProductEditorOpen(true);
   };
 
   const openDeleteConfirm = (article) => {
@@ -113,10 +159,28 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <DeleteConfirmation 
-        isOpen={isDeleteConfirmOpen} 
-        onOpenChange={setIsDeleteConfirmOpen} 
-        onConfirm={handleDeleteArticle} 
+      <DeleteConfirmation
+        isOpen={isDeleteConfirmOpen}
+        onOpenChange={setIsDeleteConfirmOpen}
+        onConfirm={handleDeleteArticle}
+      />
+
+      <ProductEditor
+        isOpen={isProductEditorOpen}
+        setIsOpen={setIsProductEditorOpen}
+        product={currentProduct}
+        onSave={handleSaveProduct}
+        onBack={() => { setIsProductEditorOpen(false); setCurrentProduct(null); }}
+      />
+
+      <UserManagement
+        isOpen={isUserManagementOpen}
+        onClose={() => setIsUserManagementOpen(false)}
+        users={users}
+        addUser={addUser}
+        updateUser={updateUser}
+        deleteUser={deleteUser}
+        currentUser={user}
       />
 
       <div className="flex h-screen bg-[#1A1A1A] text-gray-300 font-sans">
@@ -157,13 +221,29 @@ const AdminDashboard = () => {
                   </div>
                   <span className="text-xs bg-gray-600 px-1.5 py-0.5 rounded-full">{blogs.length}</span>
                 </a>
-                <a href="#" onClick={(e) => { e.preventDefault(); toast.success('Services collection coming soon!'); }} className="flex items-center justify-between text-gray-400 hover:bg-gray-700/50 hover:text-white rounded px-3 py-2">
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); setSelectedCollection('products'); setShowDashboard(false); }}
+                  className={`flex items-center justify-between rounded px-3 py-2 transition-colors ${selectedCollection === 'products' && !showDashboard ? 'bg-gray-700/50 text-white' : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'}`}
+                >
                   <div className="flex items-center gap-2">
-                    <HardDrive size={16} />
-                    <span>Services</span>
+                    <Package size={16} />
+                    <span>Products</span>
                   </div>
-                  <span className="text-xs bg-gray-800 px-1.5 py-0.5 rounded-full">6</span>
+                  <span className="text-xs bg-gray-600 px-1.5 py-0.5 rounded-full">{products.length}</span>
                 </a>
+                {user?.permissions?.canManageUsers && (
+                  <button
+                    onClick={() => setIsUserManagementOpen(true)}
+                    className="flex items-center justify-between w-full text-gray-400 hover:bg-gray-700/50 hover:text-white rounded px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Users size={16} />
+                      <span>Users</span>
+                    </div>
+                    <span className="text-xs bg-gray-600 px-1.5 py-0.5 rounded-full">{users.length}</span>
+                  </button>
+                )}
                 <button onClick={() => toast.success('Add collection feature coming soon!')} className="flex items-center gap-2 text-gray-400 hover:text-white w-full text-left rounded px-3 py-2">
                   <Plus size={16} />
                   <span>Add...</span>
@@ -191,12 +271,22 @@ const AdminDashboard = () => {
                   <p className="text-sm text-gray-400 mt-1">Selamat datang di panel Admin CMS</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button 
-                    onClick={() => openEditor(null)} 
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                  >
-                    <Plus size={16}/> Buat Artikel Baru
-                  </button>
+                  {user?.permissions?.canManageBlogs && (
+                    <button
+                      onClick={() => { openEditor(null); setShowDashboard(false); }}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                    >
+                      <Plus size={16}/> Buat Artikel Baru
+                    </button>
+                  )}
+                  {user?.permissions?.canManageProducts && (
+                    <button
+                      onClick={() => { openProductEditor(null); setSelectedCollection('products'); setShowDashboard(false); }}
+                      className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                    >
+                      <Package size={16}/> Tambah Produk
+                    </button>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="border border-red-600 text-red-500 hover:bg-red-600/10 px-4 py-2 rounded-lg flex items-center gap-2"
@@ -346,13 +436,131 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </>
+          ) : selectedCollection === 'products' ? (
+            <>
+              <header className="flex items-center justify-between border-b border-gray-700 px-6 py-3 bg-[#141414]">
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => openProductEditor(null)} 
+                    className="bg-white text-black hover:bg-gray-200 h-8 px-3 rounded flex items-center gap-2"
+                  >
+                    <Plus size={16}/> New Product
+                  </button>
+                  <button onClick={() => toast.success('Select feature coming soon!')} className="border border-gray-600 hover:bg-gray-700 h-8 px-3 rounded flex items-center gap-2">
+                    <Check size={16}/>Select
+                  </button>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button onClick={() => toast.success('Settings coming soon!')} className="text-gray-400 hover:text-white">
+                    <Settings size={18}/>
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="border border-red-600 text-red-500 hover:bg-red-600/10 h-8 px-3 rounded"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </header>
+
+              <div className="p-6 flex-1 overflow-y-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="relative w-full max-w-xs">
+                    <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full bg-[#222] border border-gray-600 pl-10 h-9 rounded px-3 text-sm text-gray-300 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <button onClick={() => toast.success('More options coming soon!')} className="text-gray-400 hover:bg-gray-700 p-2 rounded">
+                    <MoreHorizontal size={20}/>
+                  </button>
+                </div>
+
+                <div className="border border-gray-700 rounded-lg">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-gray-400 uppercase bg-gray-800/20">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 w-2/5">Name</th>
+                        <th scope="col" className="px-6 py-3 w-1/5">Category</th>
+                        <th scope="col" className="px-6 py-3">Status</th>
+                        <th scope="col" className="px-6 py-3 w-1/5">Updated</th>
+                        <th scope="col" className="px-6 py-3"><span className="sr-only">Actions</span></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.filter(p => 
+                        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+                      ).length > 0 ? (
+                        products
+                          .filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                          .map(product => (
+                            <tr key={product.id} className="border-b border-gray-700 hover:bg-gray-800/40">
+                              <td className="px-6 py-4 font-medium text-white whitespace-nowrap">{product.name}</td>
+                              <td className="px-6 py-4 text-gray-400">{product.category || '-'}</td>
+                              <td className="px-6 py-4">
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                  product.status === 'published' 
+                                    ? 'bg-green-600/20 text-green-400' 
+                                    : product.status === 'archived'
+                                    ? 'bg-gray-600/20 text-gray-400'
+                                    : 'bg-yellow-600/20 text-yellow-400'
+                                }`}>
+                                  {product.status || 'draft'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-gray-400">
+                                {product.updatedAt ? format(new Date(product.updatedAt), 'dd/MM/yyyy') : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button 
+                                    onClick={() => openProductEditor(product)} 
+                                    className="text-gray-400 hover:text-white hover:bg-gray-700 p-2 rounded"
+                                  >
+                                    <Edit2 size={16}/>
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDeleteProduct(product.id)} 
+                                    className="text-red-500 hover:text-red-400 hover:bg-gray-700 p-2 rounded"
+                                  >
+                                    <Trash2 size={16}/>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                      ) : (
+                        <tr>
+                          <td colSpan="5" className="px-6 py-12 text-center text-gray-400">
+                            <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                            <p>Belum ada produk</p>
+                            <button
+                              onClick={() => openProductEditor(null)}
+                              className="mt-3 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white text-sm"
+                            >
+                              Tambah Produk Pertama
+                            </button>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <header className="flex items-center justify-between border-b border-gray-700 px-6 py-3 bg-[#141414]">
                 <div className="flex items-center gap-2">
-                  <button onClick={() => openEditor(null)} className="bg-white text-black hover:bg-gray-200 h-8 px-3 rounded flex items-center gap-2">
-                    <Plus size={16}/> New Item
-                  </button>
+                  {user?.permissions?.canManageBlogs && (
+                    <button onClick={() => openEditor(null)} className="bg-white text-black hover:bg-gray-200 h-8 px-3 rounded flex items-center gap-2">
+                      <Plus size={16}/> New Item
+                    </button>
+                  )}
                   <button onClick={() => toast.success('Select feature coming soon!')} className="border border-gray-600 hover:bg-gray-700 h-8 px-3 rounded flex items-center gap-2"><Check size={16}/>Select</button>
                   <button onClick={() => toast.success('Edit Fields feature coming soon!')} className="border border-gray-600 hover:bg-gray-700 h-8 px-3 rounded flex items-center gap-2"><Share2 size={16}/>Edit Fields</button>
                 </div>
@@ -409,12 +617,16 @@ const AdminDashboard = () => {
                             </td>
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <button onClick={() => openEditor(post)} className="text-gray-400 hover:text-white hover:bg-gray-700 p-2 rounded">
-                                  <Edit2 size={16}/>
-                                </button>
-                                <button onClick={() => openDeleteConfirm(post)} className="text-red-500 hover:text-red-400 hover:bg-gray-700 p-2 rounded">
-                                  <Trash2 size={16}/>
-                                </button>
+                                {user?.permissions?.canEditBlogs && (
+                                  <button onClick={() => openEditor(post)} className="text-gray-400 hover:text-white hover:bg-gray-700 p-2 rounded">
+                                    <Edit2 size={16}/>
+                                  </button>
+                                )}
+                                {user?.permissions?.canDeleteBlogs && (
+                                  <button onClick={() => openDeleteConfirm(post)} className="text-red-500 hover:text-red-400 hover:bg-gray-700 p-2 rounded">
+                                    <Trash2 size={16}/>
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>

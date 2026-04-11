@@ -35,7 +35,7 @@ const Contact = () => {
     {
       icon: Phone,
       title: 'Phone',
-      value: '+62 812-3456-7890',
+      value: '+62 882-9143-7432',
       description: 'Mon-Fri from 9am to 6pm',
       color: 'from-green-500 to-emerald-600'
     },
@@ -56,9 +56,9 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-orange-600 via-pink-600 to-purple-700 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-orange-600 via-pink-600 to-purple-700 overflow-hidden pt-24">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <motion.div
