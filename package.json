@@ -1,52 +1,21 @@
 {
-  "name": "digitalita-website",
+  "name": "digitalita-monorepo",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
-    "framer-motion": "^10.18.0",
-    "lucide-react": "^0.294.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-google-recaptcha": "^3.1.0",
-    "react-hot-toast": "^2.4.1",
-    "react-quill": "^2.0.0",
-    "react-router-dom": "^6.15.0",
-    "react-scripts": "^5.0.1",
-    "slugify": "^1.6.9",
-    "tailwind-merge": "^3.5.0"
-  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev": "set PORT=8080 && react-scripts start",
-    "start": "set PORT=8080 && react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "tailwind-init": "npx tailwindcss init -p"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "build": "npm run build --workspace=frontend",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "npm run start --workspace=frontend",
+    "start:backend": "npm run start --workspace=backend"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.27",
-    "fork-ts-checker-webpack-plugin": "^6.5.3",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^3.4.19"
+    "concurrently": "^8.2.2"
   }
 }
