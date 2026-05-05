@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { motion } from 'framer-motion';
 import {
   Plus, Edit2, Trash2, LogOut, FileText, Calendar, Eye,
   TrendingUp, BarChart, Database, Settings, Share2, Clock,
-  ChevronLeft, Search, MoreHorizontal, Trello, HardDrive, FilePlus, Check,
+  ChevronLeft, Search, MoreHorizontal, Trello, Check,
   Package, Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -18,7 +17,6 @@ import UserManagement from './components/admin/UserManagement';
 const AdminDashboard = () => {
   const [blogs, setBlogs] = useState([]);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [currentArticle, setCurrentArticle] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -42,10 +40,8 @@ const AdminDashboard = () => {
   }, [isAuthenticated, navigate]);
 
   const loadBlogs = () => {
-    setLoading(true);
     const savedBlogs = JSON.parse(localStorage.getItem('digitalita_blogs')) || [];
     setBlogs(savedBlogs);
-    setLoading(false);
   };
 
   const loadProducts = () => {
@@ -210,9 +206,8 @@ const AdminDashboard = () => {
 
               <h2 className="text-sm font-semibold text-gray-400 mb-2 px-2">Collections</h2>
               <nav className="space-y-1">
-                <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); setSelectedCollection('blog'); setShowDashboard(false); }}
+                <button
+                  onClick={() => { setSelectedCollection('blog'); setShowDashboard(false); }}
                   className={`flex items-center justify-between rounded px-3 py-2 transition-colors ${selectedCollection === 'blog' && !showDashboard ? 'bg-gray-700/50 text-white' : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'}`}
                 >
                   <div className="flex items-center gap-2">
@@ -220,10 +215,9 @@ const AdminDashboard = () => {
                     <span>Blog</span>
                   </div>
                   <span className="text-xs bg-gray-600 px-1.5 py-0.5 rounded-full">{blogs.length}</span>
-                </a>
-                <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); setSelectedCollection('products'); setShowDashboard(false); }}
+                </button>
+                <button
+                  onClick={() => { setSelectedCollection('products'); setShowDashboard(false); }}
                   className={`flex items-center justify-between rounded px-3 py-2 transition-colors ${selectedCollection === 'products' && !showDashboard ? 'bg-gray-700/50 text-white' : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'}`}
                 >
                   <div className="flex items-center gap-2">
@@ -231,7 +225,7 @@ const AdminDashboard = () => {
                     <span>Products</span>
                   </div>
                   <span className="text-xs bg-gray-600 px-1.5 py-0.5 rounded-full">{products.length}</span>
-                </a>
+                </button>
                 {user?.permissions?.canManageUsers && (
                   <button
                     onClick={() => setIsUserManagementOpen(true)}
